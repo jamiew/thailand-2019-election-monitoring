@@ -29,8 +29,7 @@
 
     <div id="reports">
       <ul id="report-list">
-        <li>I am the first report</li>
-        <li>{{mustache}} {{template}}</li>
+        <li>Loading...</li>
       </ul>
     </div>
 
@@ -39,7 +38,7 @@
 
       function init() {
         var map = initMap();
-        loadPlaces(map);
+        // loadDistictMarkers(map);
         loadSpreadsheet(map);
       }
 
@@ -54,10 +53,36 @@
 
       function spreadsheetCallback(data, tabletop) {
         console.log("spreadsheetCallback", data);
+
+        reports = document.getElementById('report-list');
+        reports.innerHTML = "";
+
+        data.forEach(function(row,i){
+          console.log('row', row);
+          // value = row["Before the opening of poll and during hte day, is there any intimidation, threat, campaign or obstacles for voters by any particular group/person/party?"];
+          console.log(Object.keys(row));
+
+          reports.insertAdjacentHTML('beforeend',
+            '<li>' + i + ': '
+              + row[Object.keys(row)[0]]
+              + ' '
+              + row["What is your location?"]
+              + ' '
+              + row[Object.keys(row)[1]]
+              + ' '
+              + row[Object.keys(row)[2]]
+              + ' '
+              + row[Object.keys(row)[3]]
+            + '</li>'
+          );
+        });
       }
 
       function processSpreadsheetRow(element) {
         console.log('element', element);
+
+        // TODO geocode address if necessary?
+        // ideally would cache this... will be slamming Google APIs otherwise
 
         //  // Combine first and last name into a new column
         // element["full_name"] = element["first_name"] + " " + element["last_name"];
@@ -79,7 +104,7 @@
         return map;
       }
 
-      function loadPlaces(map) {
+      function loadDistictMarkers(map) {
         fetch("test-locations.json")
           .then(function(response){
             return response.json();
