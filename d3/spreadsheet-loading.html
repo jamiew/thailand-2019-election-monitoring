@@ -1,0 +1,42 @@
+<html>
+<head>
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <title>...</title>
+</head>
+<body>
+
+  <!--
+  <script type="text/javascript" src="js/googlesheets-to-d3-dataframe.js"></script>
+  -->
+
+  <p>Here is
+    <a href="https://docs.google.com/spreadsheets/d/1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY">
+      the spreadsheet.
+    </a>
+  </p>
+
+
+  <p>Spreadsheet ID: 1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY
+  <script>
+    var spreadsheetURL = "https://docs.google.com/spreadsheets/d/1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY";
+    var spreadsheetID = "1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY";
+
+    var url1 = "https://spreadsheets.google.com/feeds/list/" + spreadsheetID + "/od6/public/values?alt=json-in-script&callback=callback";
+    var url2 = "https://spreadsheets.google.com/feeds/list/" + spreadsheetID + "/od6/public/values?alt=json";
+    var url3 = "https://cors.io/spreadsheets.google.com/feeds/list/" + spreadsheetID + "/od6/public/values?alt=json"
+
+    console.log(url1);
+    console.log(url2);
+
+    var rawData = undefined;
+    function callback(data){
+      rawData = data;
+      console.log(data);
+      console.log(data.feed.entry[0]['gsx$title']['$t']);
+
+    }
+  </script>
+
+
+</body>
+
