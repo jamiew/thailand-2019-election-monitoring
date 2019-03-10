@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple Markers</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+        width: 65%;
+        float: left;
+      }
+      #reports {
+        background: #f0f;
+        float: left;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <div id="reports">
+      <ul id="report-list">
+        <li>I am the first report</li>
+        <li>{{mustache}} {{template}}</li>
+      </ul>
+    </div>
+
+    <script>
+      var dataPoints = undefined;
+
+      function init() {
+        var map = initMap();
+        loadPlaces(map);
+        loadSpreadsheet(map);
+      }
+
+      function loadSpreadsheet(map) {
+        Tabletop.init({
+          key: '1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY',
+          callback: spreadsheetCallback,
+          postProcess: processSpreadsheetRow,
+          simpleSheet: true // we just have one sheet
+        });
+      }
+
+      function spreadsheetCallback(data, tabletop) {
+        console.log("spreadsheetCallback", data);
+      }
+
+      function processSpreadsheetRow(element) {
+        console.log('element', element);
+
+        //  // Combine first and last name into a new column
+        // element["full_name"] = element["first_name"] + " " + element["last_name"];
+
+        // // Convert string date into Date date
+        // element["timestamp"] = Date.parse(element["displaydate"]);
+      }
+
+      // window.addEventListener('DOMContentLoaded', init);
+
+      function initMap() {
+        var bangkok = {lat: 13.7563, lng: 100.5018};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 7,
+          center: bangkok
+        });
+
+        return map;
+      }
+
+      function loadPlaces(map) {
+        fetch("test-locations.json")
+          .then(function(response){
+            return response.json();
+          })
+          .then(function(myJson) {
+            console.log(myJson);
+            dataPoints = myJson;
+
+            var red   = '#FF0000',
+                green = '#00FF00';
+
+            dataPoints.forEach(function(datum){
+
+              // var marker = new google.maps.Marker({
+              //   position: datum,
+              //   map: map,
+              //   title: 'datum'
+              // });
+
+              // Add the circle for this city to the map.
+              var cityCircle = new google.maps.Circle({
+                strokeColor: red,
+                strokeOpacity: 0.8,
+                strokeWeight: 2,
+                fillColor: red,
+                fillOpacity: 0.25,
+                map: map,
+                center: datum,
+                radius: 2000
+              });
+            })
+          });
+      }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOwtwUm11bW9DQRdg5E78JLey_ueCJO9Q&callback=init"></script>
+
+    <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.2/tabletop.min.js"></script>
+
+  </body>
+</html>
