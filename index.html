@@ -3,8 +3,15 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Simple Markers</title>
+    <title>Thailand 2019 Election Monitoring</title>
     <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
@@ -13,32 +20,63 @@
         float: left;
       }
       #reports {
-        background: #f0f;
+        border: 5px solid #eee;
         float: left;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
+        font-size: 1.1em;
+        width: 30%;
         height: 100%;
-        margin: 0;
-        padding: 0;
+        margin: 0 auto;
+        padding-right: 2em;
       }
+      #reports-list li {
+        padding-bottom: 1em;
+        line-height: 1.2em;
+      }
+
+      .button a {
+        display: block;
+        text-decoration: none;
+        margin: 0 auto;
+        padding: 1em;
+        margin-bottom: 0.5em;
+        background: #000;
+        color: #fff;
+        border: 1px solid #ccc;
+        font-size: 0.8em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+      .button a:hover {
+        background: #0a1fcc;
+      }
+
     </style>
   </head>
   <body>
     <div id="map"></div>
 
     <div id="reports">
-      <ul id="report-list">
-        <li>Loading...</li>
+
+      <div class="button" id="form-link">
+        <a target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLSeUHlIW1HhKDAcccGSVNoDlDUB74PFt0FyuhqK3dWJQtdsXvA/viewform">Form</a>
+      </div>
+
+      <div class="button" id="spreadsheet-link">
+        <a target="_blank" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQxfx964u-IkjRJthYRVpWk2QqGh4IWFPJ2cp8tfIabHFdu2MRJweGvtcbq4kEpullKQxN-5vCY-4Pv/pubhtml">Spreadsheet</a>
+      </div>
+
+      <ul id="reports-list">
+        <li id="loading">Loading..<blink>.</blink></li>
       </ul>
     </div>
 
     <script>
       var dataPoints = undefined;
+      var infoWindow = undefined;
 
       function init() {
         var map = initMap();
-        // loadDistictMarkers(map);
+        loadDistictMarkers(map);
         loadSpreadsheet(map);
       }
 
@@ -46,36 +84,45 @@
         Tabletop.init({
           key: '1G3i_DIPjHDcqS0sDoNWck9fC2NNpSirSsouFEay7cxY',
           callback: spreadsheetCallback,
-          postProcess: processSpreadsheetRow,
+          // postProcess: processSpreadsheetRow,
           simpleSheet: true // we just have one sheet
         });
       }
 
+
       function spreadsheetCallback(data, tabletop) {
         console.log("spreadsheetCallback", data);
 
-        reports = document.getElementById('report-list');
-        reports.innerHTML = "";
+        loading = document.querySelector('#loading');
+        loading.parentNode.removeChild(loading);
 
-        data.forEach(function(row,i){
+        reports = document.getElementById('reports-list');
+
+        data.forEach(function(row){
           console.log('row', row);
           // value = row["Before the opening of poll and during hte day, is there any intimidation, threat, campaign or obstacles for voters by any particular group/person/party?"];
-          console.log(Object.keys(row));
+          // console.log(Object.keys(row));
 
-          reports.insertAdjacentHTML('beforeend',
-            '<li>' + i + ': '
-              + row[Object.keys(row)[0]]
-              + ' '
-              + row["What is your location?"]
-              + ' '
-              + row[Object.keys(row)[1]]
-              + ' '
-              + row[Object.keys(row)[2]]
-              + ' '
-              + row[Object.keys(row)[3]]
-            + '</li>'
-          );
+          addReport(row);
+
+
         });
+      }
+
+      function addReport(row) {
+        reports.insertAdjacentHTML('beforeend',
+          '<li>'
+          + row[Object.keys(row)[0]]
+          + ' '
+          + row["What is your location?"]
+          + ' '
+          + row[Object.keys(row)[1]]
+          + ' '
+          + row[Object.keys(row)[2]]
+          + ' '
+          + row[Object.keys(row)[3]]
+          + '</li>'
+        );
       }
 
       function processSpreadsheetRow(element) {
@@ -98,7 +145,37 @@
 
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 7,
-          center: bangkok
+          center: bangkok,
+          // Ultra Light with Labels https://snazzymaps.com/style/151/ultra-light-with-labels
+          // styles: [{"featureType":"water","elementType":"geometry","stylers":[{"color":"#e9e9e9"},{"lightness":17}]},{"featureType":"landscape","elementType":"geometry","stylers":[{"color":"#f5f5f5"},{"lightness":20}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffffff"},{"lightness":17}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#ffffff"},{"lightness":29},{"weight":0.2}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#ffffff"},{"lightness":18}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#ffffff"},{"lightness":16}]},{"featureType":"poi","elementType":"geometry","stylers":[{"color":"#f5f5f5"},{"lightness":21}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#dedede"},{"lightness":21}]},{"elementType":"labels.text.stroke","stylers":[{"visibility":"on"},{"color":"#ffffff"},{"lightness":16}]},{"elementType":"labels.text.fill","stylers":[{"saturation":36},{"color":"#333333"},{"lightness":40}]},{"elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"geometry","stylers":[{"color":"#f2f2f2"},{"lightness":19}]},{"featureType":"administrative","elementType":"geometry.fill","stylers":[{"color":"#fefefe"},{"lightness":20}]},{"featureType":"administrative","elementType":"geometry.stroke","stylers":[{"color":"#fefefe"},{"lightness":17},{"weight":1.2}]}]
+          // WY https://snazzymaps.com/style/8097/wy
+          styles: [{"featureType":"all","elementType":"geometry.fill","stylers":[{"weight":"2.00"}]},{"featureType":"all","elementType":"geometry.stroke","stylers":[{"color":"#9c9c9c"}]},{"featureType":"all","elementType":"labels.text","stylers":[{"visibility":"on"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"landscape","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"landscape.man_made","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road","elementType":"geometry.fill","stylers":[{"color":"#eeeeee"}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"color":"#7b7b7b"}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]},{"featureType":"water","elementType":"geometry.fill","stylers":[{"color":"#c8d7d4"}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"color":"#070707"}]},{"featureType":"water","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"}]}]
+
+        });
+
+         var infoWindowContent = '<div id="content">'+
+          '<div id="siteNotice">'+
+          '</div>'+
+          '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+          '<div id="bodyContent">'+
+          '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+          'sandstone rock formation in the southern part of the '+
+          'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
+          'south west of the nearest large town, Alice Springs; 450&#160;km '+
+          '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
+          'features of the Uluru - Kata Tjuta National Park. Uluru is '+
+          'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
+          'Aboriginal people of the area. It has many springs, waterholes, '+
+          'rock caves and ancient paintings. Uluru is listed as a World '+
+          'Heritage Site.</p>'+
+          '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+          'https://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+          '(last visited June 22, 2009).</p>'+
+          '</div>'+
+          '</div>';
+
+        infoWindow = new google.maps.InfoWindow({
+          content: infoWindowContent
         });
 
         return map;
@@ -113,8 +190,8 @@
             console.log(myJson);
             dataPoints = myJson;
 
-            var red   = '#FF0000',
-                green = '#00FF00';
+            const red   = '#ff0000',
+                green = '#2fae2f';
 
             dataPoints.forEach(function(datum){
 
@@ -125,20 +202,32 @@
               // });
 
               // Add the circle for this city to the map.
-              var cityCircle = new google.maps.Circle({
-                strokeColor: red,
-                strokeOpacity: 0.8,
-                strokeWeight: 2,
-                fillColor: red,
-                fillOpacity: 0.25,
+              // Randomly make some of them negative reports
+              bad = Math.random() * 25 <= 1
+              color = bad ? red : green;
+
+              cityCircle = new google.maps.Circle({
+                strokeColor: color,
+                strokeOpacity: bad ? 0.8 : 0.1,
+                strokeWeight: bad ? 3 : 1,
+                fillColor: color,
+                fillOpacity: bad ? 0.5 : 0.1,
                 map: map,
                 center: datum,
                 radius: 2000
               });
+
+              // Doesn't actually work -- proably only works with
+              // proper map.Markers
+              // cityCircle.addListener('click', function() {
+              //   infoWindow.open(map, cityCircle);
+              // });
+
             })
           });
       }
     </script>
+
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOwtwUm11bW9DQRdg5E78JLey_ueCJO9Q&callback=init"></script>
 
     <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.2/tabletop.min.js"></script>
